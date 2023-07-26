@@ -41,16 +41,17 @@ impl<'a> Lexer<'a> {
             '0'..='9' => {
                 return Token::from(self.read_number());
             }
-            '=' => Token::Assign,
-            ';' => Token::Semicolon,
-            '(' => Token::Lparen,
-            ')' => Token::Rparen,
-            ',' => Token::Comma,
-            '+' => Token::Plus,
-            '{' => Token::Lbrace,
-            '}' => Token::Rbrace,
-            '\0' => Token::Eof,
-            _ => Token::Illegal,
+            '=' | '!' => {
+                if self.peak_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    let lit = format!("{}{}", ch, self.ch);
+                    Token::from(lit)
+                } else {
+                    Token::from(self.ch)
+                }
+            }
+            _ => Token::from(self.ch),
         };
         self.read_char();
         token
@@ -63,6 +64,13 @@ impl<'a> Lexer<'a> {
         };
 
         self.input.next();
+    }
+
+    fn peak_char(&mut self) -> char {
+        match self.input.peek() {
+            Some(ch) => *ch,
+            None => '\0',
+        }
     }
 
     fn read_identifier(&mut self) -> String {
@@ -122,7 +130,18 @@ let ten = 10;
 let add = fn(x, y) {
      x + y;
 };
-let result = add(five, ten);";
+let result = add(five, ten);
+!-/*5;
+5 < 10 > 5;
+
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+
+10 == 10;
+10 != 9;";
         let expected_tokens = vec![
             Token::Let,
             Token::Ident(String::from("five")),
@@ -160,12 +179,52 @@ let result = add(five, ten);";
             Token::Ident(String::from("ten")),
             Token::Rparen,
             Token::Semicolon,
+            Token::Bang,
+            Token::Minus,
+            Token::Slash,
+            Token::Asterisk,
+            Token::Int(String::from("5")),
+            Token::Semicolon,
+            Token::Int(String::from("5")),
+            Token::LessThan,
+            Token::Int(String::from("10")),
+            Token::GreatThan,
+            Token::Int(String::from("5")),
+            Token::Semicolon,
+            Token::If,
+            Token::Lparen,
+            Token::Int(String::from("5")),
+            Token::LessThan,
+            Token::Int(String::from("10")),
+            Token::Rparen,
+            Token::Lbrace,
+            Token::Return,
+            Token::True,
+            Token::Semicolon,
+            Token::Rbrace,
+            Token::Else,
+            Token::Lbrace,
+            Token::Return,
+            Token::False,
+            Token::Semicolon,
+            Token::Rbrace,
+            Token::Int(String::from("10")),
+            Token::Eq,
+            Token::Int(String::from("10")),
+            Token::Semicolon,
+            Token::Int(String::from("10")),
+            Token::NotEq,
+            Token::Int(String::from("9")),
+            Token::Semicolon,
             Token::Eof,
         ];
         let mut lexer = Lexer::new(input);
-        for tok in expected_tokens {
+        for (i, expected) in expected_tokens.into_iter().enumerate() {
             let actual = lexer.next_token();
-            assert_eq!(tok, actual)
+            assert_eq!(
+                expected, actual,
+                "test #{i} - token type wrong. expected={expected:?}, got={actual:?}"
+            )
         }
     }
 }
