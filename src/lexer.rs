@@ -2,11 +2,8 @@ use std::{iter::Peekable, str::Chars};
 
 use crate::token::Token;
 
-struct Lexer<'a> {
+pub(crate) struct Lexer<'a> {
     input: Peekable<Chars<'a>>,
-    // Unused for now
-    // position: usize,
-    // read_position: usize,
     ch: char,
 }
 
@@ -14,16 +11,13 @@ impl Default for Lexer<'_> {
     fn default() -> Self {
         Self {
             input: "".chars().peekable(),
-            // Unused for now
-            // position: Default::default(),
-            // read_position: Default::default(),
             ch: Default::default(),
         }
     }
 }
 
 impl<'a> Lexer<'a> {
-    fn new(input: &'a str) -> Self {
+    pub(crate) fn new(input: &'a str) -> Self {
         let mut lex = Lexer {
             input: input.chars().peekable(),
             ..Default::default()
@@ -32,7 +26,7 @@ impl<'a> Lexer<'a> {
         lex
     }
 
-    fn next_token(&mut self) -> Token {
+    pub(crate) fn next_token(&mut self) -> Token {
         self.skip_whitespace();
         let token = match self.ch {
             'a'..='z' | 'A'..='Z' | '_' => {

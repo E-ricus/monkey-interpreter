@@ -1,6 +1,14 @@
 mod lexer;
+mod repl;
 mod token;
 
+use std::io;
+
 fn main() {
-    println!("Monkey interpreter");
+    println!("Hello This is the Monkey programming language!");
+    println!("Feel free to type in commands!");
+
+    if repl::start(io::stdin(), io::stdout()).is_err() {
+        panic!("Something went wrong!")
+    }
 }
