@@ -1,8 +1,8 @@
 use std::{iter::Peekable, str::Chars};
 
-use crate::token::Token;
+use super::token::Token;
 
-pub(crate) struct Lexer<'a> {
+pub struct Lexer<'a> {
     input: Peekable<Chars<'a>>,
     ch: char,
 }
@@ -22,6 +22,7 @@ impl<'a> Lexer<'a> {
             input: input.chars().peekable(),
             ..Default::default()
         };
+        // Gets the char and the input iterator in the first position
         lex.read_char();
         lex
     }

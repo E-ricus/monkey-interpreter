@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 #[derive(Debug, PartialEq)]
-pub(crate) enum Token {
+pub enum Token {
     Illegal,
     Eof,
     // Idntifiers + Literal
