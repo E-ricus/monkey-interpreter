@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
+    // TODO: Maybe ilegal is enough
+    Empty,
     Illegal,
     Eof,
     // Idntifiers + Literal
@@ -38,6 +40,7 @@ pub enum Token {
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Token::Empty => write!(f, ""),
             Token::Illegal => write!(f, ""),
             Token::Eof => write!(f, "\0"),
             Token::Ident(value) | Token::Int(value) => write!(f, "{value}"),
