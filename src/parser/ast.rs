@@ -5,28 +5,22 @@ pub trait Node {
     fn token_literal(&self) -> String;
 }
 
-pub trait Statement<N: Node> {
-    fn statement_node();
+pub trait Statement: Node {
+    fn statement_node()
+    where
+        Self: Sized;
 }
 
-trait Expression<N: Node> {
+trait Expression: Node {
     fn expression_node();
 }
 
 // Program
-pub struct Program<T>
-where
-    T: Node,
-    T: Statement<T>,
-{
-    statements: Vec<T>,
+pub struct Program {
+    statements: Vec<Box<dyn Statement>>,
 }
 
-impl<T> Node for Program<T>
-where
-    T: Node,
-    T: Statement<T>,
-{
+impl Node for Program {
     fn token_literal(&self) -> String {
         if let Some(statement) = self.statements.get(0) {
             return statement.token_literal();
@@ -38,8 +32,7 @@ where
 // LetStatement
 struct LetStatement<'a, T>
 where
-    T: Node,
-    T: Expression<T>,
+    T: Expression,
 {
     token: Token,
     name: &'a Identifier,
@@ -48,18 +41,16 @@ where
 
 impl<'a, T> Node for LetStatement<'a, T>
 where
-    T: Node,
-    T: Expression<T>,
+    T: Expression,
 {
     fn token_literal(&self) -> String {
         format!("{}", self.token)
     }
 }
 
-impl<'a, T> Statement<T> for LetStatement<'a, T>
+impl<'a, T> Statement for LetStatement<'a, T>
 where
-    T: Node,
-    T: Expression<T>,
+    T: Expression,
 {
     fn statement_node() {}
 }
@@ -76,6 +67,6 @@ impl Node for Identifier {
     }
 }
 
-impl<T: Node> Expression<T> for Identifier {
+impl Expression for Identifier {
     fn expression_node() {}
 }

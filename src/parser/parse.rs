@@ -25,10 +25,27 @@ impl<'a> Parser<'a> {
         self.peek_token = self.lex.next_token();
     }
 
-    fn parse_program<N>(&mut self) -> Program<N>
-    where
-        N: Node + Statement<N>,
-    {
+    fn parse_program(&mut self) -> Option<&Program> {
         unimplemented!("Parse program is not implemented")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_program() {
+        let input = "
+let x = 5;
+let y = 10;
+let foobar = 838383;
+";
+        let mut lex = Lexer::new(input);
+        let parser = Parser::new(&mut lex);
+        match parser.parse_program() {
+            Some(program) => todo!(),
+            None => ,
+        }
     }
 }
